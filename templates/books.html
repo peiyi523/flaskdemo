@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>書店首頁</title>
+    <style>
+        body {
+            background-color: lightblue;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            text-align: center;
+        }
+
+        .price {
+            background-color: lightblue;
+            color: blue;
+            font-size: 24px;
+            width: 200px;
+            margin: 6px auto;
+            padding: 12px;
+        }
+
+        .bookname {
+            background-color: aqua;
+            width: 200px;
+            margin: 0 auto;
+            /* 因為有設定width所以margin的width就要設auto */
+            border-radius: 12px;
+            padding: 12px 0px;
+            font-size: 24px;
+        }
+
+        hr {
+            border: 0;
+            /* 去掉邊框 */
+            border-top: 5px solid blanchedalmond;
+            /* 設置水平線的粗细和颜色 */
+        }
+
+        .bookimage {
+            width: 250px;
+            border-radius: 12px;
+            border: 1px black solid;
+            margin: 6px auto;
+            display: block;
+
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <h1>目前書籍</h1>
+    <!-- 書籍列表:{{books}} -->
+    {% for key in books %}
+
+    <div class="bookname">{{books[key].name}}</div>
+    <div class="price">NT${{books[key].price}}</div>
+    <!-- 輸出圖片連結 -->
+    <img class="bookimage" src="{{books[key].image_url}}" alt="">
+
+    <button>購買</button>
+
+    <hr>
+
+    {% endfor %}
+
+
+</body>
+
+</html>

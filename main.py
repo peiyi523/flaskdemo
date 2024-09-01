@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 from datetime import datetime
+from script import script_stock
+
 
 # print(__name__)
 
@@ -26,6 +28,13 @@ books = {
         "image_url": "https://th.bing.com/th/id/OIP.B7eXLWyjaHmn8GYTkhG0OwHaEK?rs=1&pid=ImgDetMain",
     },
 }
+
+
+@app.route("/stocks")
+def get_stocks():
+    datas = script_stock()
+
+    return render_template("stocks.html", stocks=datas)
 
 
 # 程式練習

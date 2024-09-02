@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from datetime import datetime
-from script import script_stock
+from script import script_stock, script_pm25
 
 
 # print(__name__)
@@ -28,6 +28,19 @@ books = {
         "image_url": "https://th.bing.com/th/id/OIP.B7eXLWyjaHmn8GYTkhG0OwHaEK?rs=1&pid=ImgDetMain",
     },
 }
+
+
+@app.route("/pm25")
+def get_pm25():
+    today = datetime.now()
+    columns, values = script_pm25()
+    data = {
+        "columns": columns,
+        "values": values,
+        "today": today.strftime("%Y/%m/%d %M:%H:%S"),
+    }  # 如果值很多，可以組成字典且templates也要組{{data[columns]}}
+
+    return render_template("pm25.html", data=data)
 
 
 @app.route("/stocks")

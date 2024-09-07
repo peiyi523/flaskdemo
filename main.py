@@ -47,20 +47,22 @@ def pm25_data():
     return result
 
 
-@app.route("/pm25")
+@app.route("/pm25", methods=["GET", "POST"])
 def get_pm25():
     print(request.args)
+    print(request.form)
     today = datetime.now()
 
     sort = False
     ascending = True
 
-    # 判斷是否按下排序按鈕
-    if "sort" in request.args:
-        sort = True
-        # 取得select的option
-        ascending = True if request.args.get("sort") == "true" else False
-        print(ascending)
+    if request.method == "POST":
+        # 判斷是否按下排序按鈕
+        if "sort" in request.form:
+            sort = True
+            # 取得select的option
+            ascending = True if request.form.get("sort") == "true" else False
+            print(ascending)
 
     columns, values = script_pm25(sort, ascending)
     data = {

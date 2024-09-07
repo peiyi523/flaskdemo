@@ -24,6 +24,7 @@
             margin: 0 auto;
             height: 800px;
             overflow-y: auto;
+            overflow-x: auto;
         }
 
         /* 這邊是RWD的用法 */
@@ -69,6 +70,16 @@
 <body>
     <h1 class="title">全省PM2.5資訊</h1>
     <h3>目前時間:{{data["today"]}}</h3>
+
+    <form action="">
+        <select name="sort" id="sort">
+            <option value="true">升</option>
+            <option value="false">降</option>
+        </select>
+
+        <button type="submit">排序</button>
+
+    </form>
     <div id="table-container">
         <table border="1">
 

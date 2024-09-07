@@ -1,13 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 
-def script_pm25():
+def script_pm25(sort=False, ascending=True):
     try:
         url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON"
         datas = requests.get(url).json()["records"]
-        columns = list(datas[0].keys())
-        values = [list(data.values()) for data in datas]
+        df = pd.DataFrame(datas)
+        df["pm25"] = df["pm25"].apply(lambda x: eval(x))
+        if sort:
+            df = df.sort_values("pm25", ascending=ascending)
+
+        columns = df.columns
+        values = df.values
+
         return columns, values
     except Exception as e:
         print(e)
@@ -38,4 +45,4 @@ def script_stock():
 
 if __name__ == "__main__":
     print(script_stock())
-    print(script_pm25())
+    print(script_pm25(sort=True, ascending=False))

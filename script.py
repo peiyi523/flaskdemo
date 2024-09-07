@@ -2,10 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON"
+
+
+def get_pm25_json():
+    column, values = script_pm25()
+    xdata = [value[0] for value in values]
+    ydata = [value[2] for value in values]
+    json_data = {"site": xdata, "pm25": ydata}
+
+    return json_data
+
 
 def script_pm25(sort=False, ascending=True):
     try:
-        url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON"
         datas = requests.get(url).json()["records"]
         df = pd.DataFrame(datas)
         df["pm25"] = df["pm25"].apply(lambda x: eval(x))
@@ -44,5 +54,6 @@ def script_stock():
 
 
 if __name__ == "__main__":
-    print(script_stock())
-    print(script_pm25(sort=True, ascending=False))
+    # print(script_stock())
+    # print(script_pm25(sort=True, ascending=False))
+    print(get_pm25_json())

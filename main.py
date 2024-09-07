@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-from script import script_stock, script_pm25
+from script import script_stock, script_pm25, get_pm25_json
 import json
 
 
@@ -31,20 +31,31 @@ books = {
 }
 
 
+@app.route("/pm25-data")
+def pm25_data():
+    try:
+        json_data = get_pm25_json()
+        return json.dumps(json_data, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps({"result": "failure", "exception": str(e)})
+        # 組成json格式再透過json的dumps進行值的回傳
+
+
 @app.route("/pm25-charts")
 def pm25_charts():
     return render_template("pm25-charts.html")
 
 
-@app.route("/pm25-data", methods=["GET"])  # 預設是GET資料不機密使用
-def pm25_data():
-    columns, values = script_pm25()
-    site = [value[0] for value in values]
-    pm25 = [value[2] for value in values]
-    result = json.dumps(
-        {"site": site, "pm25": pm25}, ensure_ascii=False
-    )  # 組成json格式再透過json的dumps進行值的回傳
-    return result
+# @app.route("/pm25-data", methods=["GET"])  # 預設是GET資料不機密使用
+# def pm25_data():
+#     columns, values = script_pm25()
+#     site = [value[0] for value in values]
+#     pm25 = [value[2] for value in values]
+#     result = json.dumps(
+#         {"site": site, "pm25": pm25}, ensure_ascii=False
+#     )  # 組成json格式再透過json的dumps進行值的回傳
+#     return result
 
 
 @app.route("/pm25", methods=["GET", "POST"])

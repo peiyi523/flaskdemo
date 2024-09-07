@@ -71,15 +71,20 @@
     <h1 class="title">全省PM2.5資訊</h1>
     <h3>目前時間:{{data["today"]}}</h3>
     <a href="">重新讀取</a>
-    <form action="" method="POST">
-        <select name="sort" id="sort">
-            <option value="true">升</option>
-            <option value="false">降</option>
-        </select>
+    <div>
+        <input type="checkbox" name="" id="check-reload">
+        開啟
+        <input name="delay-sec" id="reload-sec" type="number">秒數
+        <form action="" method="POST">
+            <select name="sort" id="sort">
+                <option value="true">升</option>
+                <option value="false">降</option>
+            </select>
 
-        <button type="submit">排序</button>
+            <button type="submit">排序</button>
 
-    </form>
+        </form>
+    </div>
     <div id="table-container">
         <table border="1">
 
@@ -107,6 +112,52 @@
 
 
         </table>
+        <script>
+            const checkReload = document.querySelector("#check-reload");
+            const reloadSecond = document.querySelector("#reload-sec");
+            const delaySecond = 30;
+
+
+            window.onload = function () {
+                console.log("reload!");
+                //讀取
+                checkReload.checked = sessionStorage.getItem("CheckReload") == "true";
+                reloadSecond.value = sessionStorage.getItem("ReloadSecond") ? sessionStorage.getItem("ReloadSecond")
+                    : delaySecond;
+
+                SetUpdateInterval();
+            };
+
+            checkReload.addEventListener("change", () => {
+                //儲存
+                sessionStorage.setItem("CheckReload", checkReload.checked);
+                SetUpdateInterval();
+            });
+
+            reloadSecond.addEventListener("input", () => {
+                checkReload.check = false;
+                sessionStorage.setItem("CheckReload", checkReload.checked);
+                sessionStorage.setItem("ReloadSecond", reloadSecond.value);
+
+            })
+
+            let intervalId = null;
+            function SetUpdateInterval() {
+                if (checkReload.checked) {
+                    console.log("start reload!");
+                    let sec = Number(reloadSecond.value) * 1000;
+                    // 取得對應的interval id
+                    intervalId = setInterval((() => {
+                        window.location.reload();
+                    }), sec);
+                } else {
+                    // 清除interval id
+                    clearInterval(intervalId)
+                }
+            }
+
+
+        </script>
     </div>
     <!-- {{data["columns"]}}
     {{data["values"]}} -->

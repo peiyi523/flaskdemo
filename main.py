@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from datetime import datetime
-from script import script_stock, script_pm25
+from script import script_stock, script_pm25, get_pm25_json, get_six_pm25_json
+import json
 
 
 # print(__name__)
@@ -30,14 +31,66 @@ books = {
 }
 
 
-@app.route("/pm25")
+@app.route("/six-pm25-data")
+def six_pm25_data():
+    try:
+        json_data = get_six_pm25_json()
+        print(json_data)
+        return json.dumps(json_data, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps({"result": "failure", "exception": str(e)})
+
+
+@app.route("/pm25-data")
+def pm25_data():
+    try:
+        json_data = get_pm25_json()
+        return json.dumps(json_data, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps({"result": "failure", "exception": str(e)})
+        # 組成json格式再透過json的dumps進行值的回傳
+
+
+@app.route("/pm25-charts")
+def pm25_charts():
+    return render_template("pm25-charts.html")
+
+
+# @app.route("/pm25-data", methods=["GET"])  # 預設是GET資料不機密使用
+# def pm25_data():
+#     columns, values = script_pm25()
+#     site = [value[0] for value in values]
+#     pm25 = [value[2] for value in values]
+#     result = json.dumps(
+#         {"site": site, "pm25": pm25}, ensure_ascii=False
+#     )  # 組成json格式再透過json的dumps進行值的回傳
+#     return result
+
+
+@app.route("/pm25", methods=["GET", "POST"])
 def get_pm25():
+    print(request.args)
+    print(request.form)
     today = datetime.now()
-    columns, values = script_pm25()
+
+    sort = False
+    ascending = True
+
+    if request.method == "POST":
+        # 判斷是否按下排序按鈕
+        if "sort" in request.form:
+            sort = True
+            # 取得select的option
+            ascending = True if request.form.get("sort") == "true" else False
+            print(ascending)
+
+    columns, values = script_pm25(sort, ascending)
     data = {
         "columns": columns,
         "values": values,
-        "today": today.strftime("%Y/%m/%d %M:%H:%S"),
+        "today": today.strftime("%Y/%m/%d %H:%M:%S"),
     }  # 如果值很多，可以組成字典且templates也要組{{data[columns]}}
 
     return render_template("pm25.html", data=data)
@@ -99,4 +152,6 @@ def index():
     return render_template("index.html", date=today, name=name)
 
 
-app.run(debug=True)  # 加debug=True是為了在開發時測試，方便即時反應，實際發佈時要拿掉
+# print(pm25_data())
+# app.run(debug=True)  # 加debug=True是為了在開發時測試，方便即時反應，實際發佈時要拿掉
+app.run(host="0.0.0.0")  # 目前要設定host="0.0.0.0"

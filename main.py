@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-from script import script_stock, script_pm25, get_pm25_json
+from script import script_stock, script_pm25, get_pm25_json, get_six_pm25_json
 import json
 
 
@@ -29,6 +29,17 @@ books = {
         "image_url": "https://th.bing.com/th/id/OIP.B7eXLWyjaHmn8GYTkhG0OwHaEK?rs=1&pid=ImgDetMain",
     },
 }
+
+
+@app.route("/six-pm25-data")
+def six_pm25_data():
+    try:
+        json_data = get_six_pm25_json()
+        print(json_data)
+        return json.dumps(json_data, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps({"result": "failure", "exception": str(e)})
 
 
 @app.route("/pm25-data")

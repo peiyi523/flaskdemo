@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON"
+six_countys = ["臺北市", "新北市", "桃園市", "臺中市", "臺南市", "高雄市"]
+df = None
 
 
 def get_six_pm25_json():
@@ -13,9 +15,21 @@ def get_six_pm25_json():
 
 def get_pm25_json():
     column, values = script_pm25()
+
     xdata = [value[0] for value in values]
     ydata = [value[2] for value in values]
-    json_data = {"site": xdata, "pm25": ydata}
+
+    datas = list(zip(xdata, ydata))
+    datas = sorted(datas, key=lambda x: x[1])
+
+    json_data = {
+        "site": xdata,
+        "pm25": ydata,
+        "hightest": datas[-1],
+        "lowest": datas[0],
+    }
+
+    print(datas)
 
     return json_data
 
@@ -28,18 +42,20 @@ def convert_value(value):
 
 
 def get_pm25_data():
-    datas = requests.get(url).json()["records"]
-    df = pd.DataFrame(datas)
-    # 將非正常數值轉換成None
-    df["pm25"] = df["pm25"].apply(convert_value)
-    # 移除有None的數據
-    df = df.dropna()
+    global df
+    if df is None:
+        datas = requests.get(url).json()["records"]
+        df = pd.DataFrame(datas)
+        # 將非正常數值轉換成None
+        df["pm25"] = df["pm25"].apply(convert_value)
+        # 移除有None的數據
+        df = df.dropna()
 
     return df
 
 
 def scrape_six_pm25():
-    six_countys = ["臺北市", "新北市", "桃園市", "臺中市", "臺南市", "高雄市"]
+
     pm25 = []
     try:
         df = get_pm25_data()
@@ -99,4 +115,4 @@ def script_stock():
 if __name__ == "__main__":
     # print(script_stock())
     # print(script_pm25(sort=True, ascending=False))
-    print(get_six_pm25_json())
+    print(get_pm25_json())

@@ -1,3 +1,10 @@
+const chart1 = echarts.init(document.getElementById('main'));
+const chart2 = echarts.init(document.getElementById('six'));
+
+
+
+
+
 $.ajax(
     {
         url: "/pm25-data",
@@ -10,9 +17,26 @@ $.ajax(
     }
 );
 
+$.ajax(
+    {
+        url: "/six-pm25-data",
+        type: "GET",
+        dataType: "json",
+        success: (data) => {
+            console.log(data);
+            drawChart(chart2, data["site"], data["pm25"], title = "六都pm2.5平均數據", name = "pm2.5");
+        }
+    }
+);
+
+
+
+
+
+
 
 // 基于準備好的dom，初始化echarts實例
-let chart1 = echarts.init(document.getElementById('main'));
+
 
 function drawChart(chart, xdata, ydata, title = "圖表", name = "數值") {
 
@@ -35,6 +59,7 @@ function drawChart(chart, xdata, ydata, title = "圖表", name = "數值") {
                 name: name,
                 type: 'bar',
                 data: ydata
+
             }
         ]
     };
